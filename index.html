@@ -3,140 +3,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI T-Shirt Designer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: url('sunrise_background.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #333;
-    }
-
-    header {
-      text-align: center;
-      padding: 2rem 1rem;
-      background-color: rgba(255, 255, 255, 0.6);
-      border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-
-    header p {
-      margin: 0.5rem 0 0;
-      font-size: 1rem;
-      opacity: 0.8;
-    }
-
-    main {
-      margin: 2rem auto;
-      background: rgba(255, 255, 255, 0.85);
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      width: 90%;
-      max-width: 480px;
-    }
-
-    label {
-      font-weight: 600;
-      margin-top: 1rem;
-      display: block;
-    }
-
-    select, input[type="file"], button {
-      width: 100%;
-      margin-top: 0.5rem;
-      font-size: 1rem;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    button {
-      background-color: #ff6f00;
-      color: white;
-      border: none;
-      margin-top: 1.5rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #e65100;
-    }
-
-    .preview {
-      margin-top: 2rem;
-      text-align: center;
-    }
-
-    .preview img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      margin: 0.5rem 0;
-    }
-
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.5rem;
-      }
-      main {
-        padding: 1.5rem;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DP Design - AI T-Shirt Generator</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
   <header>
-    <h1>AI T-Shirt Designer</h1>
-    <p>Upload your artwork and preview 3 fun mockups</p>
+    <h1>DP Design</h1>
+    <p>Create AI-powered T-shirt designs from your artwork</p>
   </header>
 
   <main>
-    <form id="uploadForm">
-      <label for="imageUpload">Upload Your Artwork</label>
-      <input type="file" id="imageUpload" accept="image/*" required />
+    <section class="upload-section">
+      <h2>Upload Your Artwork</h2>
+      <form id="upload-form">
+        <input type="file" accept="image/*" required />
+        <button type="submit">Generate Designs</button>
+      </form>
+    </section>
 
-      <label for="styleSelect">Choose a Design Style</label>
-      <select id="styleSelect">
-        <option value="modern">Modern</option>
-        <option value="minimalist">Minimalist</option>
-        <option value="grunge">Grunge</option>
-        <option value="vintage">Vintage</option>
-      </select>
-
-      <button type="submit">Generate Designs</button>
-    </form>
-
-    <div class="preview" id="preview"></div>
+    <section class="mockup-preview">
+      <h2>Your T-Shirt Mockups</h2>
+      <div class="mockup-grid">
+        <div class="mockup-card">
+          <img src="mockup_placeholder.png" alt="Mockup 1" />
+          <p>Design 1</p>
+        </div>
+        <div class="mockup-card">
+          <img src="mockup_placeholder.png" alt="Mockup 2" />
+          <p>Design 2</p>
+        </div>
+        <div class="mockup-card">
+          <img src="mockup_placeholder.png" alt="Mockup 3" />
+          <p>Design 3</p>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <script>
-    const form = document.getElementById("uploadForm");
-    const preview = document.getElementById("preview");
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const file = document.getElementById("imageUpload").files[0];
-      if (!file) return;
-
-      preview.innerHTML = `
-        <p>Here are your AI-generated mockups (example only):</p>
-        <img src="https://via.placeholder.com/400x400?text=Mockup+1" />
-        <img src="https://via.placeholder.com/400x400?text=Mockup+2" />
-        <img src="https://via.placeholder.com/400x400?text=Mockup+3" />
-      `;
-    });
-  </script>
+  <footer>
+    <p>© 2025 DP Design. All rights reserved.</p>
+  </footer>
 </body>
 </html>
