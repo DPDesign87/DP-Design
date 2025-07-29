@@ -25,9 +25,7 @@
 
     <section class="mockup-preview">
       <h2>Your T-Shirt Mockups</h2>
-      <div class="mockup-grid" id="mockupGrid">
-        <!-- AI-generated images will be shown here -->
-      </div>
+      <div class="mockup-grid" id="mockupGrid"></div>
     </section>
   </main>
 
@@ -59,7 +57,10 @@
           const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: base64Image })
+            body: JSON.stringify({
+              image: base64Image,
+              stylePrompt: "Bold graphic t-shirt design inspired by this artwork"
+            })
           });
 
           const data = await response.json();
