@@ -17,26 +17,16 @@
     <section class="upload-section">
       <h2>Upload Your Artwork</h2>
       <form id="upload-form">
-        <input type="file" accept="image/*" required />
+        <input type="file" id="imageInput" accept="image/*" required />
         <button type="submit">Generate Designs</button>
       </form>
+      <p id="loading" style="display:none;">Generating designs... please wait ⏳</p>
     </section>
 
     <section class="mockup-preview">
       <h2>Your T-Shirt Mockups</h2>
-      <div class="mockup-grid">
-        <div class="mockup-card">
-          <img src="mockup_placeholder.png" alt="Mockup 1" />
-          <p>Design 1</p>
-        </div>
-        <div class="mockup-card">
-          <img src="mockup_placeholder.png" alt="Mockup 2" />
-          <p>Design 2</p>
-        </div>
-        <div class="mockup-card">
-          <img src="mockup_placeholder.png" alt="Mockup 3" />
-          <p>Design 3</p>
-        </div>
+      <div class="mockup-grid" id="mockupGrid">
+        <!-- Images will be injected here -->
       </div>
     </section>
   </main>
@@ -44,5 +34,43 @@
   <footer>
     <p>© 2025 DP Design. All rights reserved.</p>
   </footer>
+
+  <script>
+    const form = document.getElementById("upload-form");
+    const mockupGrid = document.getElementById("mockupGrid");
+    const loading = document.getElementById("loading");
+
+    const placeholderImages = [
+      "mockup_placeholder1.png",
+      "mockup_placeholder2.png",
+      "mockup_placeholder3.png"
+    ];
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const file = document.getElementById("imageInput").files[0];
+      if (!file) return alert("Please select an image first.");
+
+      // Show loading
+      loading.style.display = "block";
+      mockupGrid.innerHTML = "";
+
+      // Simulate 4 second "AI" generation delay
+      setTimeout(() => {
+        loading.style.display = "none";
+
+        placeholderImages.forEach((src, index) => {
+          const div = document.createElement("div");
+          div.className = "mockup-card";
+          div.innerHTML = \`
+            <img src="\${src}" alt="Mockup \${index + 1}" />
+            <p>Design \${index + 1}</p>
+          \`;
+          mockupGrid.appendChild(div);
+        });
+      }, 4000);
+    });
+  </script>
 </body>
 </html>
