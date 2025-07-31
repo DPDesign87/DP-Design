@@ -72,10 +72,16 @@
             data.results.forEach((url, index) => {
               const div = document.createElement("div");
               div.className = "mockup-card";
-              div.innerHTML = \`
-                <img src="\${url}" alt="Design \${index + 1}" />
-                <p>Design \${index + 1}</p>
-              \`;
+
+              const img = document.createElement("img");
+              img.src = url;
+              img.alt = `Design ${index + 1}`;
+
+              const caption = document.createElement("p");
+              caption.textContent = `Design ${index + 1}`;
+
+              div.appendChild(img);
+              div.appendChild(caption);
               mockupGrid.appendChild(div);
             });
           } else {
