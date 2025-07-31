@@ -1,37 +1,40 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DP Design - AI T-Shirt Generator</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>DP Design</h1>
-    <p>Create AI-powered T-shirt designs from your artwork</p>
-  </header>
+  <div class="background">
+    <header>
+      <div class="logo-text">
+        <h1>DP</h1>
+        <p>Design</p>
+      </div>
+    </header>
 
-  <main>
-    <section class="upload-section">
-      <h2>Upload Your Artwork</h2>
-      <form id="upload-form">
-        <input type="file" id="imageInput" accept="image/*" required />
-        <button type="submit">Generate Designs</button>
-      </form>
-      <p id="loading" style="display:none;">Generating designs... please wait ⏳</p>
-    </section>
+    <main>
+      <section class="upload-section">
+        <h2>Upload Your Artwork</h2>
+        <form id="upload-form">
+          <input type="file" id="imageInput" accept="image/*" required />
+          <button type="submit">Generate Designs</button>
+        </form>
+        <p id="loading" style="display:none;">Generating designs... please wait ⏳</p>
+      </section>
 
-    <section class="mockup-preview">
-      <h2>Your T-Shirt Mockups</h2>
-      <div class="mockup-grid" id="mockupGrid"></div>
-    </section>
-  </main>
+      <section class="mockup-preview">
+        <h2>Your T-Shirt Mockups</h2>
+        <div class="mockup-grid" id="mockupGrid"></div>
+      </section>
+    </main>
 
-  <footer>
-    <p>© 2025 DP Design. All rights reserved.</p>
-  </footer>
+    <footer>
+      <p>© 2025 DP Design. All rights reserved.</p>
+    </footer>
+  </div>
 
   <script>
     const form = document.getElementById("upload-form");
@@ -59,7 +62,7 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               image: base64Image,
-              stylePrompt: "Bold graphic t-shirt design inspired by this artwork"
+              stylePrompt: "Bold colorful t-shirt design based on this artwork"
             })
           });
 
