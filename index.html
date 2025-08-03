@@ -1,102 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DP Design - AI T-Shirt Generator</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="background">
-    <header>
-      <div class="logo-text">
-        <h1>DP</h1>
-        <p>Design</p>
-      </div>
-    </header>
+<script>
+  document.getElementById("image-upload").addEventListener("change", function () {
+    const reader = new FileReader();
+    reader.onloadend = async function () {
+      const base64Image = reader.result;
 
-    <main>
-      <section class="upload-section">
-        <h2>Upload Your Artwork</h2>
-        <form id="upload-form">
-          <input type="file" id="imageInput" accept="image/*" required />
-          <button type="submit">Generate Designs</button>
-        </form>
-        <p id="loading" style="display:none;">Generating designs... please wait ⏳</p>
-      </section>
+      const prompt = "design a trendy t-shirt illustration based on the uploaded image";
 
-      <section class="mockup-preview">
-        <h2>Your T-Shirt Mockups</h2>
-        <div class="mockup-grid" id="mockupGrid"></div>
-      </section>
-    </main>
+      try {
+        const response = await fetch("https://dp-ai-backend.vercel.app/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            image: base64Image,
+            stylePrompt: prompt
+          })
+        });
 
-    <footer>
-      <p>© 2025 DP Design. All rights reserved.</p>
-    </footer>
-  </div>
+        const data = await response.json();
 
-  <script>
-    const form = document.getElementById("upload-form");
-    const mockupGrid = document.getElementById("mockupGrid");
-    const loading = document.getElementById("loading");
+        const output = document.getElementById("output");
+        output.innerHTML = ""; // Clear previous results
 
-    const API_URL = "https://dp-design-seven.vercel.app/api/generate";
-
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
-
-      const file = document.getElementById("imageInput").files[0];
-      if (!file) return alert("Please select an image.");
-
-      loading.style.display = "block";
-      mockupGrid.innerHTML = "";
-
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Image = reader.result;
-
-        try {
-          const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              image: base64Image,
-              stylePrompt: "Bold colorful t-shirt design based on this artwork"
-            })
+        if (data.results && data.results.length > 0) {
+          data.results.forEach((url) => {
+            const img = document.createElement("img");
+            img.src = url;
+            img.alt = "Generated Design";
+            img.className = "preview";
+            output.appendChild(img);
           });
-
-          const data = await response.json();
-
-          if (data.results && Array.isArray(data.results)) {
-            data.results.forEach((url, index) => {
-              const div = document.createElement("div");
-              div.className = "mockup-card";
-
-              const img = document.createElement("img");
-              img.src = url;
-              img.alt = "Design " + (index + 1);
-
-              const caption = document.createElement("p");
-              caption.textContent = "Design " + (index + 1);
-
-              div.appendChild(img);
-              div.appendChild(caption);
-              mockupGrid.appendChild(div);
-            });
-          } else {
-            mockupGrid.innerHTML = "<p>Something went wrong. Try again later.</p>";
-          }
-        } catch (err) {
-          console.error(err);
-          mockupGrid.innerHTML = "<p>Failed to connect to the AI server.</p>";
-        } finally {
-          loading.style.display = "none";
+        } else {
+          output.innerHTML = "<p>No results generated. Try again.</p>";
         }
-      };
+      } catch (error) {
+        console.error("Error generating designs:", error);
+        document.getElementById("output").innerHTML = "<p>Failed to generate designs.</p>";
+      }
+    };
 
-      reader.readAsDataURL(file);
-    });
-  </script>
-</body>
-</html>
+    reader.readAsDataURL(this.files[0]);
+  });
+</script>
