@@ -68,7 +68,7 @@
 
       reader.onloadend = async () => {
         try {
-          const response = await fetch("https://dp-design-server.fly.dev/api/generate", {
+          const response = await fetch("https://api.dpdesign.net/api/generate", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
