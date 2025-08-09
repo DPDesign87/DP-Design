@@ -3,26 +3,34 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DP Design – AI T‑Shirt Mockups</title>
+  <title>DP Design – AI T‑Shirt Mockups (with Debug)</title>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#0f2238;color:#e7f0fa}
-    header{padding:32px 16px;text-align:center}
-    main{max-width:900px;margin:0 auto;padding:16px}
+    header{padding:24px 16px;text-align:center}
+    main{max-width:950px;margin:0 auto;padding:16px}
     .card{background:#0a1b2d;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px}
     .row{display:grid;gap:10px;grid-template-columns:1fr 1fr}
     input,button{padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#0f2238;color:#e7f0fa}
     button{cursor:pointer;font-weight:700;background:#ffb95a;color:#1c1300;border:none}
+    .muted{color:#9fb3c8;font-size:13px}
     #out{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:14px}
     img{width:100%;border-radius:10px}
-    .muted{color:#9fb3c8;font-size:13px}
+    .debug{white-space:pre-wrap;background:#061427;border:1px solid rgba(255,255,255,.12);padding:12px;border-radius:10px;margin-top:10px;max-height:300px;overflow:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+    label{display:block;margin-top:8px;font-weight:600}
   </style>
 </head>
 <body>
   <header>
     <h1>DP Design — Upload & Generate T‑Shirt Mockups</h1>
-    <p class="muted">Upload an image (or just enter a prompt). The backend returns up to three mockups.</p>
+    <p class="muted">If you see <em>Unexpected token '<'</em>, your API is returning HTML (e.g., a 404 page) instead of JSON. Use the API URL box below to point at your live backend.</p>
   </header>
   <main>
+    <section class="card" style="margin-bottom:16px">
+      <label for="api">API URL (must return JSON)</label>
+      <input id="api" placeholder="/api/generate (same project) or https://your-app.vercel.app/api/generate" />
+      <div class="muted">Tip: Test your URL in a new tab — you should NOT see an HTML page. You should see JSON like {"error":"Method Not Allowed"} unless you POST.</div>
+    </section>
+
     <section class="card">
       <div class="row">
         <input id="prompt" placeholder="Describe your tee… e.g. retro surf, pastel, vector" />
@@ -34,28 +42,55 @@
       </div>
       <div id="status" class="muted" style="margin-top:8px"></div>
       <div id="out"></div>
+      <details style="margin-top:12px">
+        <summary>Debug response</summary>
+        <div class="debug" id="debugBox">(nothing yet)</div>
+      </details>
     </section>
   </main>
+
   <script>
-    const API = '/api/generate'; // same project, no CORS issues
+    const apiInput = document.querySelector('#api');
     const file = document.querySelector('#file');
     const prompt = document.querySelector('#prompt');
     const out = document.querySelector('#out');
     const statusEl = document.querySelector('#status');
+    const debugBox = document.querySelector('#debugBox');
+
+    // Default to same-project API
+    apiInput.value = localStorage.getItem('dp_api_url') || '/api/generate';
+    apiInput.addEventListener('change', () => {
+      localStorage.setItem('dp_api_url', apiInput.value.trim());
+    });
 
     document.querySelector('#go').addEventListener('click', async () => {
       out.innerHTML = '';
+      debugBox.textContent = '';
       statusEl.textContent = 'Submitting…';
+
       const fd = new FormData();
       if (file.files[0]) fd.append('image', file.files[0]);
       if (prompt.value.trim()) fd.append('prompt', prompt.value.trim());
 
+      const API = apiInput.value.trim() || '/api/generate';
+
       try {
         const r = await fetch(API, { method: 'POST', body: fd });
+        const ct = (r.headers.get('content-type') || '').toLowerCase();
+
+        // If not JSON, show the text body to explain the error (HTML 404/500, etc.)
+        if (!ct.includes('application/json')) {
+          const text = await r.text();
+          debugBox.textContent = `URL: ${API}\nStatus: ${r.status} ${r.statusText}\nContent-Type: ${ct}\n\n${text.slice(0, 4000)}`;
+          throw new Error("Backend returned non‑JSON (likely an HTML error page). Check the API URL and that /api/generate exists.");
+        }
+
         const data = await r.json();
+        debugBox.textContent = JSON.stringify(data, null, 2);
+
         if (!r.ok) throw new Error(data?.error || 'request failed');
         const images = Array.isArray(data.images) ? data.images : [];
-        if (!images.length) throw new Error('No images returned. Try a simpler prompt or a faster model.');
+        if (!images.length) throw new Error('No images returned. Try a simpler prompt or a faster/compatible model.');
         out.innerHTML = images.map(u => `<img src="${u}" alt="mockup" />`).join('');
         statusEl.textContent = 'Done!';
       } catch (e) {
@@ -68,6 +103,7 @@
       statusEl.textContent = '';
       prompt.value = '';
       file.value = '';
+      debugBox.textContent = '(nothing yet)';
     });
   </script>
 </body>
