@@ -1,100 +1,183 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DP Design – AI T-Shirt Generator</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DP Design – AI T‑Shirt Generator</title>
+  <meta name="description" content="Generate up to 3 AI t‑shirt mockups from your prompt." />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-image: url('background.png');
-      background-size: cover;
-      background-position: center;
-      color: white;
-      padding: 2em;
+    :root{
+      --bg1:#0e2a47; --bg2:#214d7c; --sun:#ffcc66; --accent:#ffd38d; --ink:#0b1622; --card:#11263f; --muted:#9fb3c8;
     }
-    h1 {
-      font-size: 3em;
-      font-style: italic;
-      font-weight: bold;
-      margin-bottom: 0.2em;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      color:#e7f0fa; background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      background-attachment:fixed; display:flex; flex-direction:column;
     }
-    h2 {
-      font-size: 1.5em;
-      margin-top: 0;
-      font-style: italic;
-      font-weight: bold;
+    header{position:relative; padding:48px 16px 24px; text-align:center; overflow:hidden}
+    header .sun{position:absolute; width:520px; height:520px; background:radial-gradient(circle at 50% 50%,var(--sun),rgba(255,204,102,.0) 70%);
+      top:-220px; left:50%; transform:translateX(-50%); filter:blur(1px); opacity:.6}
+    header h1{position:relative; margin:0; font-size:clamp(28px,4vw,44px); letter-spacing:.3px}
+    header p{position:relative; margin:8px auto 0; max-width:720px; color:var(--muted)}
+    .animals{position:absolute; inset:auto 0 -6px 0; height:110px; pointer-events:none; opacity:.2;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="110" viewBox="0 0 1200 110"><path fill="%23ffffff" fill-opacity="0.8" d="M0 80 C150 100 250 60 400 85 C550 110 650 70 800 90 C950 110 1050 80 1200 95 L1200 110 L0 110 Z"/></svg>') repeat-x center/cover}
+    .wrap{width:100%; max-width:1100px; margin:0 auto; padding:12px 16px 48px; flex:1;}
+    .card{background:rgba(17,38,63,.75); border:1px solid rgba(255,255,255,.06); box-shadow:0 12px 30px rgba(0,0,0,.35);
+      border-radius:18px; padding:18px; backdrop-filter: blur(8px)}
+    .grid{display:grid; gap:16px}
+    @media(min-width:900px){.grid{grid-template-columns:420px 1fr}}
+
+    label{display:block; font-weight:600; margin:10px 0 6px}
+    input[type="text"], select, button{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.12);
+      background:#0f2238; color:#e7f0fa; font-size:16px; outline:none;
     }
-    input, button {
-      margin: 1em;
-      padding: 1em;
-      font-size: 1em;
-    }
-    .designs {
-      margin-top: 2em;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1em;
-    }
-    .designs img {
-      max-width: 300px;
-      border: 2px solid white;
-      border-radius: 8px;
-    }
+    input::placeholder{color:#7f99b9}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .hint{color:#9fb3c8; font-size:13px; margin-top:6px}
+    button{cursor:pointer; font-weight:700; background:linear-gradient(180deg,#ffb95a,#ff9c2f); color:#1c1300; border:none}
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .danger{background:#c62828;color:#fff}
+
+    .results{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-top:12px}
+    .mock{position:relative; background:#061221; border-radius:14px; border:1px solid rgba(255,255,255,.08); overflow:hidden}
+    .mock img{display:block; width:100%; height:auto}
+    .mock .badge{position:absolute; top:8px; left:8px; background:rgba(0,0,0,.55); padding:4px 8px; border-radius:999px; font-size:12px}
+
+    .pug{position:relative; width:120px; height:120px; margin:16px auto 0; background:radial-gradient(circle at 50% 45%,#f7e1b5, #c8a97e 68%);
+      border-radius:18px; box-shadow:inset 0 0 10px rgba(0,0,0,.25), 0 10px 30px rgba(0,0,0,.25)}
+    .pug:before,.pug:after{content:""; position:absolute; background:#4a3728; width:26px; height:26px; border-radius:50%; top:26px}
+    .pug:before{left:26px} .pug:after{right:26px}
+    .pug .nose{position:absolute; left:50%; top:54px; width:24px; height:18px; transform:translateX(-50%); background:#3b2b21; border-radius:10px}
+
+    footer{color:#97aac2; text-align:center; padding:24px 12px; font-size:13px}
+    .small{font-size:12px;color:#91a6bf}
+    .hr{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent); margin:12px 0}
   </style>
 </head>
 <body>
-  <h1>DP</h1>
-  <h2>Design</h2>
+  <header>
+    <div class="sun"></div>
+    <h1>DP Design — AI T‑Shirt Generator</h1>
+    <p>Create up to three t‑shirt mockups from your description. Paste your Vercel API URL below once your backend is live.</p>
+    <div class="animals"></div>
+  </header>
 
-  <input type="file" id="imageInput" accept="image/*" />
-  <button onclick="generateDesigns()">Generate Designs</button>
+  <main class="wrap grid">
+    <!-- Controls -->
+    <section class="card">
+      <div class="pug"><div class="nose"></div></div>
+      <div class="hr"></div>
+      <label for="apiUrl">API URL</label>
+      <input id="apiUrl" type="text" placeholder="https://YOUR-APP.vercel.app/api/generate" />
+      <div class="hint">This is your secure backend endpoint. We never put API keys in the browser.</div>
 
-  <div class="designs" id="designsContainer"></div>
+      <label for="prompt">Prompt</label>
+      <input id="prompt" type="text" placeholder="e.g. cute pug pocket t‑shirt design, pastel vector" />
+
+      <div class="row">
+        <div>
+          <label for="size">Size</label>
+          <select id="size">
+            <option value="S">Small</option>
+            <option value="M" selected>Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">XL</option>
+            <option value="2XL">2XL</option>
+          </select>
+        </div>
+        <div>
+          <label for="fit">Fit</label>
+          <select id="fit">
+            <option value="unisex" selected>Unisex</option>
+            <option value="mens">Men's</option>
+            <option value="womens">Women's</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint">Size & fit are for your order flow. They don't affect the AI image yet (we can wire that later).</div>
+
+      <label for="imageUrl">(Optional) Reference Image URL</label>
+      <input id="imageUrl" type="text" placeholder="https://… (only for models that support image conditioning)" />
+
+      <div class="row" style="margin-top:14px">
+        <button id="generateBtn">Generate Designs</button>
+        <button id="clearBtn" class="danger">Clear</button>
+      </div>
+      <div class="hint" id="status"></div>
+    </section>
+
+    <!-- Output -->
+    <section class="card">
+      <h3 style="margin:6px 0 4px">Results</h3>
+      <div class="small">We’ll show up to three images below.</div>
+      <div class="results" id="results" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="hr"></div>
+    <div>© <span id="year"></span> DP Design. Built with ❤️ and a tiny serverless function.</div>
+  </footer>
 
   <script>
-    async function generateDesigns() {
-      const input = document.getElementById('imageInput');
-      const file = input.files[0];
+    const $ = (sel) => document.querySelector(sel);
+    const apiUrlInput = $('#apiUrl');
+    const promptInput = $('#prompt');
+    const imageInput = $('#imageUrl');
+    const generateBtn = $('#generateBtn');
+    const clearBtn = $('#clearBtn');
+    const results = $('#results');
+    const statusEl = $('#status');
 
-      if (!file) {
-        alert('Please upload an image first!');
-        return;
+    // Persist API URL locally so you don't have to paste it every time
+    apiUrlInput.value = localStorage.getItem('dp_api_url') || '';
+    apiUrlInput.addEventListener('change', () => localStorage.setItem('dp_api_url', apiUrlInput.value.trim()));
+
+    async function generate() {
+      const API_URL = apiUrlInput.value.trim();
+      if (!API_URL) { alert('Please paste your API URL first.'); apiUrlInput.focus(); return; }
+      const prompt = promptInput.value.trim();
+      const imageUrl = imageInput.value.trim();
+      results.innerHTML = '';
+      setStatus('Submitting…');
+      generateBtn.disabled = true; clearBtn.disabled = true;
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, imageUrl })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || 'Request failed');
+        const images = Array.isArray(data.images) ? data.images : [];
+        if (!images.length) throw new Error('No images returned. Try a simpler prompt or a faster model.');
+        results.innerHTML = images.map((u, i) => (
+          `<figure class="mock"><span class="badge">#${i+1}</span><img alt="design ${i+1}" src="${u}" /></figure>`
+        )).join('');
+        setStatus('Done!');
+      } catch (err) {
+        setStatus('Error: ' + (err?.message || err));
+      } finally {
+        generateBtn.disabled = false; clearBtn.disabled = false;
       }
-
-      const reader = new FileReader();
-
-      reader.onloadend = async () => {
-        try {
-          const response = await fetch("https://api.dpdesign.net/api/generate", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ image: reader.result }),
-          });
-
-          if (!response.ok) throw new Error("Failed to generate images.");
-
-          const data = await response.json();
-          const container = document.getElementById('designsContainer');
-          container.innerHTML = "";
-
-          data.images.forEach((url) => {
-            const img = document.createElement('img');
-            img.src = url;
-            container.appendChild(img);
-          });
-        } catch (err) {
-          console.error("Error generating designs:", err);
-          alert("Failed to generate T-shirt designs. Please try again.");
-        }
-      };
-
-      reader.readAsDataURL(file);
     }
+
+    function clearAll(){
+      results.innerHTML = '';
+      promptInput.value = '';
+      imageInput.value = '';
+      setStatus('');
+    }
+    function setStatus(msg){ statusEl.textContent = msg; }
+
+    generateBtn.addEventListener('click', generate);
+    clearBtn.addEventListener('click', clearAll);
+
+    // year
+    $('#year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
